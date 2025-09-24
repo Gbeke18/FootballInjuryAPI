@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Injury Prediction</title>
+  <style>
+    /* Basic reset */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+                   Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      background: linear-gradient(180deg, #f6f8fb 0%, #ffffff 100%);
+      color: #1f2937;
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.4;
+      padding: 32px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 900px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(20, 30, 60, 0.08);
+      padding: 28px;
+      margin: 20px;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+      color: #0f1724;
+    }
+    p.lead {
+      color: #475569;
+      margin-bottom: 18px;
+      font-size: 0.95rem;
+    }
+
+    form {
+      width: 100%;
+    }
+
+    /* Responsive two-column grid for inputs */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    @media (min-width: 780px) {
+      .grid { grid-template-columns: repeat(2, 1fr); gap: 18px; }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-size: 0.88rem;
+      margin-bottom: 6px;
+      color: #0b1220;
+      font-weight: 600;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #e6e9ef;
+      background: #fff;
+      font-size: 0.95rem;
+      transition: box-shadow .12s ease, border-color .12s ease;
+    }
+    input::placeholder { color: #9aa4b2; }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: #6b8cff;
+      box-shadow: 0 4px 18px rgba(107, 140, 255, 0.12);
+    }
+
+    .fullwidth {
+      grid-column: 1 / -1;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    button.primary {
+      background: linear-gradient(90deg,#3b82f6,#6366f1);
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(59,130,246,0.12);
+      transition: transform .08s ease, box-shadow .12s ease;
+    }
+    button.primary:hover { transform: translateY(-1px); }
+    button.primary:active { transform: translateY(0); }
+
+    .result {
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 10px;
+      background: #f8fafc;
+      border: 1px solid #eef2ff;
+      color: #0f1724;
+    }
+
+    .prob {
+      margin-top: 8px;
+      font-size: 0.95rem;
+      color: #334155;
+      background: rgba(99,102,241,0.06);
+      padding: 8px;
+      border-radius: 8px;
+      display: inline-block;
+    }
+
+    /* small helper text */
+    .hint {
+      font-size: 0.82rem;
+      color: #64748b;
+      margin-top: 6px;
+    }
+
+    /* error styling if you want to show validation messages */
+    .error {
+      color: #b91c1c;
+      font-size: 0.88rem;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Injury Prediction Form</h2>
+    <p class="lead">Fill the values below and click Predict.</p>
+
+    <form method="post" novalidate>
+      {% set features = [
+        'Training_Hours_Per_Week',
+        'Stress_Level_Score',
+        'Workload_Stress_Index',
+        'Sleep_Efficiency',
+        'Recovery_Score',
+        'Injury_Risk_Score',
+        'BMI',
+        'Fitness_Workload_Ratio',
+        'Recovery_Deficit',
+        'session_load_mean',
+        'session_load_std',
+        'session_load_max',
+        'ACWR_mean',
+        'ACWR_max',
+        'ACWR_last',
+        'load_spike_sum',
+        'monotony_mean',
+        'strain_mean',
+        'pitch_condition_mean',
+        'conflict_level_mean',
+        'match_intensity_sum'
+      ] %}
+
+      <div class="grid">
+        {% for f in features %}
+          <div class="field">
+            <label for="{{ f }}">{{ f.replace('_', ' ') }}</label>
+            <input type="text" id="{{ f }}" name="{{ f }}" placeholder="Enter {{ f }}" />
+            <div class="hint">Numeric value expected for {{ f.replace('_', ' ') }}.</div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="primary">Predict</button>
+        <div class="hint">Tip: leave empty fields as 0 or use sensible defaults.</div>
+      </div>
+    </form>
+
+    {% if prediction is defined %}
+      <div class="result">
+        <strong>Prediction:</strong> {{ prediction }}
+        {% if probability %}
+          <div class="prob">Probabilities: {{ probability }}</div>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</body>
+</html>
